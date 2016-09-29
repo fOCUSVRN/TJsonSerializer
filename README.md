@@ -1,3 +1,60 @@
+#TJsonSerializer 
+It is thу "one-line" serializer/deserializer of the JSON.
+
+##Using
+
+```pas
+uses TJsonSerializer;
+
+MyClass:=TJsonSerializer.Deserialize<TMyClass>(Json);
+
+// or 
+
+Json:=TjsonSeializer.Serialize(MyClass);
+
+```
+
+###Features:
+- Supports Delphi XE10
+- Correct serialize/deserialize null field. Need to set field type to variant. In code available check for null
+- Can serialize/deserialize properties
+- Can use Attribute [SOIgnore] to ignore the serialization/deserialization field or property
+
+Need to add uses SuperObject
+For example:
+
+```pas
+type 
+TMyClass = class
+public
+[SOIgnore]
+ignored_field:string;
+[SOName("bar")]
+foo:string;
+end;
+
+```
+
+```js
+{
+	"bar" : "value"
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # SuperObject
 
 ## What is JSON ?
