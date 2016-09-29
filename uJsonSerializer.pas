@@ -5,7 +5,7 @@ interface
 uses sysutils, classes, generics.collections;
 
 type
-  TJsonSerializator = class
+  TJsonSerializer = class
   public
     class function Serialize<T>(const obj: T): String;
     class function Deserialize<T>(const Json: string): T;
@@ -15,9 +15,9 @@ implementation
 
 uses superobject;
 
-{ TJsonSerializator }
+{ TJsonSerializer }
 
-class function TJsonSerializator.Deserialize<T>(const Json: string): T;
+class function TJsonSerializer.Deserialize<T>(const Json: string): T;
 var
   ctx: TSuperRttiContext;
 begin
@@ -29,7 +29,7 @@ begin
   end;
 end;
 
-class function TJsonSerializator.Serialize<T>(const obj: T): String;
+class function TJsonSerializer.Serialize<T>(const obj: T): String;
 var
   ctx: TSuperRttiContext;
 begin
