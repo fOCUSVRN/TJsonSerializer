@@ -2008,6 +2008,30 @@ function TSuperObject.Write(writer: TSuperWriter; indent: boolean;
               Inc(pos);
               start_offset := pos;
             end;
+          #8, #9, #10, #12, #13:
+            begin
+              if (pos - start_offset > 0) then
+                Append(str + start_offset, pos - start_offset);
+
+              if (C = #8) then
+                Append(ESC_BS, 2)
+              else if (C = #9) then
+                Append(ESC_TAB, 2)
+              else if (C = #10) then
+                Append(ESC_LF, 2)
+              else if (C = #12) then
+                Append(ESC_FF, 2)
+              else if (C = #13) then
+                Append(ESC_CR, 2)
+              else if (C = '"') then
+                Append(ESC_QUOT, 2)
+              else if (C = '\') then
+                Append(ESC_SL, 2)
+              else if (C = '/') then
+                Append(ESC_SR, 2);
+              Inc(pos);
+              start_offset := pos;
+            end
         else
           Inc(pos);
         end;
@@ -2038,9 +2062,11 @@ var
   iter: TSuperObjectIter;
   st: AnsiString;
   val: ISuperObject;
+
 const
   ENDSTR_A: PSOChar = '": ';
   ENDSTR_B: PSOChar = '":';
+
 begin
 
   if FProcessing then
@@ -3766,6 +3792,7 @@ begin
                 ObjectFindClose(Ite);
               end;
         stArray:
+
           begin
             arr := Obj.AsArray;
             with FO.c_array do
@@ -6604,7 +6631,9 @@ begin
               Value := GetTypeData(TypeInfo).ClassType.Create;
             // fields
             for F in Context.GetType(Value.AsObject.ClassType).GetFields do
-              if (F.FieldType <> nil) and (IsNotAttrIgnored(F)) then
+              if (F.FieldType <> nil) and
+                (IsNotAttrIgnored(F) and
+                (F.Visibility = tmembervisibility.mvPublic)) then
               begin
                 v := TValue.Empty;
                 Result := FromJson(F.FieldType.Handle,
@@ -6616,7 +6645,11 @@ begin
               end;
             // properties
             for p in Context.GetType(Value.AsObject.ClassType).GetProperties do
-              if (p.PropertyType <> nil) and (IsNotAttrIgnored(p)) then
+              if (p.PropertyType <> nil) and
+                (IsNotAttrIgnored(p) and
+                (p.Visibility = tmembervisibility.mvPublic)) and (p.IsWritable)
+
+              then
               begin
                 v := TValue.Empty;
                 Result := FromJson(p.PropertyType.Handle,
@@ -6669,7 +6702,9 @@ begin
         end
         else
         begin
-          Result := false;
+          // позволим не ругаться, т.е. если в json нет record, по аналогии с object ничего ему не присвоим
+          Value := nil;
+          // Result := false;
           Exit;
         end;
       end;
